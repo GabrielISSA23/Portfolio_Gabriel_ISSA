@@ -6,8 +6,9 @@ Thus, we estimate **client default risk** using three regression models: **Linea
 
 ## key outputs :
 
--> `Credit_Default_Analysis.Rmd` to see the latex pdf with the entire code of the project 
--> `/Output_plots` folder to see graphs of the projects
+- `Credit_Default_Analysis.Rmd` to see the latex pdf with the entire code of the project
+  
+- `/Output_plots` folder to see graphs of the projects
 
 ## What the Project do ? 
 
