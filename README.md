@@ -8,7 +8,7 @@ This repository showcases various projects I have worked on, whether professiona
 
 ## Repository Structure
 
-* **`Project 3`**: 
+* **`Project 3`**: An R-based project focused on using linear and non-linear regression to estimate probabilities of payment default.
 
 * **`Other Projects`**: Showcases various projects I have worked that are more or less closely related to data science. 
 
