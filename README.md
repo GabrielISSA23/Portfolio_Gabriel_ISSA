@@ -6,9 +6,9 @@ My name is *Gabriel*, and I have just completed a dual master's degree at *Centr
 
 This repository showcases various projects I have worked on, whether professionally, academically, or personally, using several programming languages: **Python**, **R**, **C**, and **SQL**. Some focus on technical topics such as finance, while others reflect my personal interests, including music and strategy games.
 
-## Project Structure
+## Repository Structure
 
-* **`Data Analysis and Viz Projects`**: Focuses on projects involving data manipulation, analysis, and visualization.
+* **`Project 3`**: 
 
-* **`AI Projects`**: Showcases various projects I have worked on in machine learning and artificial intelligence more broadly.
+* **`Other Projects`**: Showcases various projects I have worked that are more or less closely related to data science. 
 
