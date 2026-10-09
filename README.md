@@ -1,6 +1,6 @@
 # Portfolio Gabriel ISSA
 
-My name is Gabriel, and I have just completed a dual master's degree at Centrale Lille and EDHEC. With one year of experience in the data field, I aim to pursue my career as a Data Scientist or in similar roles.
+My name is *Gabriel*, and I have just completed a dual master's degree at *Centrale Lille* and *EDHEC*. With one year of experience in the data field, I aim to pursue my career as a Data Scientist or in similar roles.
 
 ## What is this about ? 
 
