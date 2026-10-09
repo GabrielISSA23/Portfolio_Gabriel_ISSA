@@ -12,11 +12,11 @@ Thus, we estimate **client default risk** using three regression models: **Linea
 
 ## What the Project do ? 
 
-Step 1 : Import and transform the credit data and create explonatory variable corresponding to the designed model. 
-Step 2 :  Inspect correlations between variables.
-Step 3 : Estimate the three regression model Linear Probability Model, Logit, and Probit models.
-Step 4 :  Predict default probabilities for 10 loan applicants.
-Step 5 : Calculate expected profit for one-year loans at a 10% interest rate for each of the applicants and decide which loan should be accepted.
+- Step 1 : Import and transform the credit data and create explonatory variable corresponding to the designed model. 
+- Step 2 :  Inspect correlations between variables.
+- Step 3 : Estimate the three regression model Linear Probability Model, Logit, and Probit models.
+- Step 4 :  Predict default probabilities for 10 loan applicants.
+- Step 5 : Calculate expected profit for one-year loans at a 10% interest rate for each of the applicants and decide which loan should be accepted.
 
 ## How to run it in local ? 
 
