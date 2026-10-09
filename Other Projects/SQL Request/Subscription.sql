@@ -17,7 +17,7 @@ SELECT
 FROM
    (streaming.client_mails1 UNION ALL streaming.client_mails2) AS client_mail_all
 WHERE
-    source_name IN ("noumeastreaming-mailing-1", "noumeastreaming-mailing-2","noumeastreaming-mailing-2")
+    source_name IN ("noumeastreaming-mailing", "France-noumeastreaming-mailing")
     AND mail_type = "Subscription" 
     AND member_name NOT IN ["Fabrice","François","Frédérique"] --outliers than needs to be deleted 
 ),
