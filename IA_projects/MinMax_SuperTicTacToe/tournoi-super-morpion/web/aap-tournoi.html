@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<!-- **** H E A D **** -->
+<head>	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>AAP-tournoi</title>
+
+<style>
+
+table {
+	width:60%;
+	border:1px solid black;
+	padding:3px;
+	margin:auto;	
+	text-align:center;
+}
+
+
+th,td {
+	border:1px solid black;
+	padding:3px;
+}
+
+.even {
+	background-color:lavender;
+}
+
+.odd {
+	background-color:lightyellow;
+}
+
+
+.ATTENTE {
+	background-color:lightgrey !important;
+}
+
+.QUALIFIE, .EXEMPT, .ENCOURS {
+	background-color:lightgreen !important; 
+
+}
+.ELIMINE, .TERMINE {
+	background-color:#ffcccb !important;
+
+}
+
+</style>
+
+<script src="js/jquery.js"></script>
+<script>
+
+var filename="../data/tournoi.js"; 
+var refreshtime=1;
+
+// TODO Organiser les parties autrement : recommencer par retour de la première d'abord 
+// Bien faire passer les parties par ATTENTE, ENCOURS puiS TERMINE
+
+$(document).ready(function(){
+	$("#filename").val(filename);
+	$("#refreshtime").val(refreshtime);
+	
+	searchParams = new URLSearchParams(window.location.search); 
+	var phase = searchParams.get("phase");
+	if (phase != null) {
+		$("#filename").val(phase+".js");
+		filename = phase+".js"; 
+	}
+
+	window.setTimeout(refresh,0);
+
+	$("#filename").change(function (){
+		filename = $(this).val();
+		window.setTimeout(refresh,refreshtime*1000);
+		$(this).animate({opacity: 0.25},1000, function(){
+			$(this).animate({opacity: 1});
+		});
+	});
+
+	$("#refreshtime").change(function (){
+		refreshtime = $(this).val();
+		$(this).animate({opacity: 0.25},1000, function(){
+			$(this).animate({opacity: 1});
+		});
+	});
+
+});
+
+
+
+function traiterJson(oRep){
+	var i; var r, p, j;
+	
+		$("#phasename").html(oRep.nom);
+	
+		$("#phases").empty();
+		for(i=0;i<oRep.phases.length;i++) {
+			jR = $("<tr>");
+			jR.addClass(oRep.phases[i].status); 
+			
+			
+			if (oRep.phases[i].status != "ATTENTE") {
+				jR.append("<td class=\"nom\"><a href=\"aap-phase.html?phase=../data/" 
+										+ oRep.phases[i].nom + ".js\">" + oRep.phases[i].nom + "</a></td>"); 
+			} else {
+				jR.append("<td class=\"nom\">" + oRep.phases[i].nom + "</td>"); 
+			}
+			jR.append("<td class=\"nbjoueurs\">" + oRep.phases[i].nbJoueurs +"</td>");
+			jR.append("<td class=\"statut\">" + oRep.phases[i].status +"</td>"); 
+			
+			$("#phases").append(jR);
+		}
+
+
+
+	window.setTimeout(refresh,refreshtime*1000);
+}
+
+function refresh() {
+	console.log("refresh");
+	getJson();
+}
+
+function getJson() {
+	var scriptElement = document.createElement('script');
+	scriptElement.src = filename + '?cle=' + Math.random();
+	document.body.appendChild(scriptElement);
+}
+
+</script>
+
+</head>
+
+<body>
+
+
+<h1>AAP-tournoi</h1>
+
+Sync avec fichier : <input type="text" id="filename"/> <br/>
+Période raffraichissement : <input type="text" id="refreshtime"/> <br/>
+
+<h2>Phases</h2>
+
+<table>
+<tr>
+<th>Lien</th>
+<th>Nb Joueurs</th>
+<th>Statut</th>
+</tr>
+<tbody id="phases">
+</tbody>
+</table>
+
+
+</body>
+</html>
+

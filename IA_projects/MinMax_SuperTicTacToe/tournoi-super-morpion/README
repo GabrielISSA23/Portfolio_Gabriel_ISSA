@@ -1,0 +1,78 @@
+Trois programmes sont proposés pour vous permettre de mettre au point les programmes qui participeront au tournoi final qui déterminera un classement. 
+
+- defi permet de jouer contre un programme (temps fixe par coup) 
+- duel permet de faire jouer deux programmes l'un contre l'autre (contre de temps identique au tournoi : 15min+30s/coup)
+- tournoi permet de lancer un tournoi faisant concourrir tous les programmes présents dans le répertoire "joueurs" dont le nom commence par "j". 
+
+--- RAPPEL & CONDITIONS d'EXECUTION : ----
+
+Les programmes joueur sont destinataires d'une chaine FEN et du nombre de secondes restantes pour le reste de la partie. Ils doivent renvoyer sur la sortie standard le coup qu'ils veulent jouer, à l'exception de toute autre chose. 
+
+Pour déboguer, vous pouvez faire renvoyer par vos programmes des messages sur la sortie d'erreur. Ces messages ne seront pas considérés par les programmes tournoi, duel et defi.   
+
+--- Programme defi ---- 
+
+defi <path_prog1> <o|x> <delai>
+
+Ce programme permet de joueur contre un adversaire informatique. 
+- Le premier argument désigne le chemin du programme adversaire (commencer par ./ pour désigner un chemin relatif) ;
+- Le second argument désigne la couleur à jouer par le joueur humain ;
+- Le troisième argument désigne le temps offert au programme adversaire pour chaque coup (pas de décrémentation du temp d'un coup à l'autre). 
+
+Lors de cette partie, il est possible de suivre les positions en direct à l'aide de la page web/aap-direct.html ou post-mortem avec la page web/aap-partie.html qui permettra de rejouer les coups. 
+
+
+--- Programme duel ---- 
+
+duel <path_prog1> <path_prog2>
+
+Ce programme permet de faire jouer ensemble deux adversaires informatiques. 
+Chaque argument désigne le chemin des programmes qui doivent s'affronter (commencer par ./ pour désigner un chemin relatif). 
+
+Variable d'environnement PAUSE : si une variable d'environnement nommé PAUSE, affectée à une valeur quelconque, est définie au moment de l'exécution du programme defi, l'utilisateur devra appuyer sur ENTREE après chaque coup de chaque programme. Cela permettra de voir à l'écran les messages générés par les programmes à des fins de débogage. 
+
+Lors de cette partie, il est possible de suivre les positions en direct à l'aide de la page web/aap-direct.html ou post-mortem avec la page web/aap-partie.html qui permettra de rejouer les coups. 
+
+--- Programme tournoi ---- 
+
+C'est ce programme qui sera utilisé pour établir un classement général des programmes rendus par les étudiants. 
+Vous pouvez l'utiliser pour faire concourir vos programmes entre-eux. 
+Lors d'un tournoi vous pouvez suivre l'évolution des parties à l'aide de la page web/aap-standalone.html. 
+
+Compte tenu du nombre d'équipes de fil rouge, nous organiserons un tournoi en formule coupe, à élimination directe, un tournoi toutes-rondes durerait trop longtemps. 
+
+Les numéros situés après la lettre j permettent de déterminer un ordre des programmes. Les programmes associés au plus petit numéro sont considérés comme têtes de série et sont susceptibles d'être exempts lors de la phase de qualification du tournoi. 
+
+Dans le tournoi final, l'ordre des programmes sera déterminé en fonction des moyennes des notes obtenues aux QCM en séance par les étudiants composant l'équipe de fil rouge. Une équipe composée d'étudiants ayant obtenu de meilleurs résultats qu'une autre sera donc mieux classée.
+
+Chaque rencontre entre deux programmes se fera en match aller-retour. Pour déterminer le programme qualifié, le résultat de chaque partie sera déterminé par la somme des valeurs suivantes : 
+
+ 100.000 points pour une victoire des RONDS, -100 000 pour une défaite , 0 pour match nul 
++ 10.000 * (marqueursO - marqueursX) : différence de marqueurs obtenus par chaque joueur 
++ (TRO - TRX) : différence entre les temps restants à chaque joueur à la fin de la partie  
+
+NB : Compte tenu des cadences (15min+30s/coup), jamais la différence de temps des deux joueurs ne pourra dépasser 5000. 
+
+Le joueur opérant les RONDS marque les points de la partie, celui opérant les croix marque la valeur opposée. Les résultats des deux parties seront additionnés  pour donner le score de chaque joueur. Ainsi, en cas d'égalité (une victoire chacun ou deux matchs nul), les marqueurs sont prépondérants. En cas d'égalité aux marqueurs, le programme ayant joué le plus rapidement est qualifié. Si une situation d'égalité persiste encore, le programme tête de série se qualifie. 
+
+
+-- Exemple 1 --
+
+Si J1 bat J2 lors de la première partie en réalisant un alignement de 3 pions tandis que son adversaire avait créé 4 marqueurs, le résultat de la partie sera de 90.000 (100.000 + 10.000 (3-4)) + TJ1-TJ2. J1 marque 90.000+TJ1-TJ2, J2 marque -90.000+TJ2-TJ1.
+
+Si dans la seconde partie, J2 bat J1 par 5 pions contre 2, le résultat de la partie sera de -100.000 + 10.000 (2-5) + TJ1'-TJ2' soit -130.000+TJ1'-TJ2'. J1 marque -130.000+TJ1'-TJ2', J2 marque 130.000+TJ2-TJ1. 
+
+Finalement, le résultat sera le suivant : J1 marque -40.000+2DeltaT, J2 marque 40.000-2DeltaT : J2 est qualifié. 
+
+-- Exemple 2 --
+
+Si J1 bat J2 lors de la première partie en réalisant un alignement de 3 pions tandis que son adversaire avait créé 1 marqueur, le résultat de la partie sera de 120.000+DeltaT
+Si dans la seconde partie, J2 bat J1 par 5 pions contre 4, le résultat de la partie sera de -110.000+DeltaT. 
+
+Finalement, le résultat sera le suivant : J1 marque 10.000+2DeltaT, J2 marque -10.000-2DeltaT : J1 est qualifié. 
+  
+
+
+
+
+

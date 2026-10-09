@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>AAP-direct</title>
+
+	<style>
+	
+		table {
+			border:1px solid black;
+			padding:3px;
+			margin:auto;	
+			text-align:center;
+			width:60%;
+		}
+		
+		.trait {
+			background-color:yellow;
+		}
+		
+		th,td {
+			border:1px solid black;
+			padding:3px;
+		}
+		
+		.selected{
+			border : 5px solid black !important;
+		}
+
+		#supermorpion{
+			margin:auto;
+			padding:0px;
+		}
+
+		.grille {
+			border : 1px solid black;
+			border-collapse: collapse;
+			margin:auto;
+			padding:0px;
+		}
+
+		.terminee td{
+			border : none !important;
+		}
+
+		.terminee {
+			display:inline-block;
+		}
+
+		.terminee .rond {
+			visibility:hidden !important;
+		}
+
+		.grille td {
+			border : 1px solid black;
+		}
+
+		.grille td {
+			margin:0px;
+			padding:2px;
+		}
+
+		.grille .rond {
+			display:inline-block;
+			width:60px;	height:60px;		
+		}
+
+
+		.blanc { background-color:white;border-radius : 50%;
+			border: 1px solid black; }
+		.noir { background-color:black;border-radius : 50%;
+			border: 1px solid black; }
+
+	</style>
+	
+	<script src="js/jquery.js"></script>
+	<script>
+		var nomsJoueurs = ["Joueur 1", "Joueur 2"];
+		var trait = 0; // 0 ou 1 // surtout pas de chaines de car.  
+		var cols = ["blanc","noir"]; 
+
+		var filename="../data/duel.js"; 
+		var refreshtime=5;
+
+		function infosJ(trait) {
+			return "(" + cols[trait] + ")"; 
+		}
+
+		function afficherTrait(trait) {
+			// affiche le nom correspondant au numéro du joueur 
+			$("#trait").html(getNom(trait));
+		}
+
+		function getNom(trait) {
+			// affiche des infos additionnelles sur chaque joueur 
+			// gérées pas le code js du jeu lui-même (couleurs...) 
+			var s = nomsJoueurs[trait];
+			if (infosJ(trait) != false) s+= " " + infosJ(trait); 
+			return s; 
+		}
+
+		function resetGrille() {
+			var i,j;
+			for(i=0;i<9;i++) {
+				for(j=0;j<9;j++) {
+					$(".grille.i_"+i + ".j_"+j )
+						.addClass("jouable selected")
+						.removeClass("terminee")
+						.removeClass("pleine")
+						.data("jouable","1")
+						.data("couleur","vide"); 
+						
+					$(".case.i_"+i + ".j_"+j+ " .rond" )
+						.data("couleur", "vide")
+						.addClass("vide")
+						.removeClass("noir")
+						.removeClass("blanc");
+				}
+			}
+		}
+
+		function jouerCoup(coup) {
+			console.log("coup à jouer : " + coup);
+			// Il faut appeler la fonction qui joue le coup 
+			// Le coup : i_grille+"_"+j_grille+"_"+i+"_"+j
+			var cp = coup.split("_"); 
+			$(".grille.i_"+cp[0]+".j_"+cp[1]+" .case.i_"+cp[2]+".j_"+cp[3]).click();
+		}
+
+		// TODO : Faire une fonction initialisant une position 
+
+
+
+
+		// TODO : tester égalité 
+
+		var gains = [
+		[[0,0],[0,1],[0,2]],
+		[[1,0],[1,1],[1,2]],
+		[[2,0],[2,1],[2,2]],
+		[[0,0],[1,0],[2,0]],
+		[[0,1],[1,1],[2,1]],
+		[[0,2],[1,2],[2,2]],
+		[[0,0],[1,1],[2,2]],
+		[[0,2],[1,1],[2,0]]
+		]; 
+
+
+		function isPleine(i,j) {
+			var grille = (".grille.i_"+i+".j_"+j); 
+			if ($(".vide",grille).length ==0) return true;
+			else return false; 
+		}
+
+		function testerGrille(i,j) {
+			var k; 
+			console.log("test grille i=" + i + " j=" + j);
+			//dumpGrille(i,j); 
+			for(k=0; k<8;k++) {
+				//console.log("test k=" + k);
+				//console.log(gains[k]); 
+				var grille = $(".grille.i_"+i+".j_"+j); 
+				var nextI = gains[k][0][0]; 
+				var nextJ = gains[k][0][1];  
+				var col1 = $(".case.i_"+nextI+".j_"+nextJ+" .rond",grille).data("couleur");
+				var nextI = gains[k][1][0]; 
+				var nextJ = gains[k][1][1];  
+				var col2 = $(".case.i_"+nextI+".j_"+nextJ+" .rond",grille).data("couleur");
+				var nextI = gains[k][2][0]; 
+				var nextJ = gains[k][2][1];  
+				var col3 = $(".case.i_"+nextI+".j_"+nextJ+" .rond",grille).data("couleur");
+				//console.log("col1=" + col1+ " col2=" + col2+ " col3="+col3);
+				if ( (col1 == col2) && (col2 == col3) && (col1 != "vide") ) {
+					//alert("gain ! ");		
+					return col1;  
+				}
+			}
+
+			return false; 
+		}
+
+		function dumpGrilles() {
+			var i,j;
+			for(i=0;i<3;i++)
+			for(j=0;j<3;j++) {
+				console.log("Grille " + i + ","  + j + " couleur : " + $(".grille.i_"+i+".j_"+j).data("couleur"));
+			}
+		}
+
+		function dumpGrille(ig,jg) {
+			var i,j;
+			var grille = $(".grille.i_"+ig+".j_"+jg); 
+			for(i=0;i<3;i++)
+			for(j=0;j<3;j++) {
+				console.log("Grille ig=" +ig +" jg=" +jg +" i=" + i + ",j="  + j + " couleur : " + $(".case.i_"+i+".j_"+j+" .rond",grille).data("couleur"));
+			}
+		}
+
+		function testerJeu(){
+			// On doit vérifier si un joueur a aligné trois grilles 
+
+			var k; 
+			//dumpGrilles();
+			for(k=0; k<8;k++) {
+				//console.log(k);
+				var nextI = gains[k][0][0]; 
+				var nextJ = gains[k][0][1];  
+				var col1 = $(".grille.i_"+nextI+".j_"+nextJ).data("couleur");
+				var nextI = gains[k][1][0]; 
+				var nextJ = gains[k][1][1];  
+				var col2 = $(".grille.i_"+nextI+".j_"+nextJ).data("couleur");
+				var nextI = gains[k][2][0]; 
+				var nextJ = gains[k][2][1];  
+				var col3 = $(".grille.i_"+nextI+".j_"+nextJ).data("couleur");
+				//console.log("col1=" + col1+ " col2=" + col2+" col3="+col3);
+				if ( (col1 == col2) && (col2 == col3) && (col1 != "vide") ) return col1;  
+			}
+
+			// OU s'il a gagné 5 grilles 
+			var score = {"blanc": 0, "noir": 0, "vide":0, "jouable":0};
+			score[$(".grille.i_0.j_0").data("couleur")]++;
+			score[$(".grille.i_0.j_1").data("couleur")]++;
+			score[$(".grille.i_0.j_2").data("couleur")]++;
+			score[$(".grille.i_1.j_0").data("couleur")]++;
+			score[$(".grille.i_1.j_1").data("couleur")]++;
+			score[$(".grille.i_1.j_2").data("couleur")]++;
+			score[$(".grille.i_2.j_0").data("couleur")]++;
+			score[$(".grille.i_2.j_1").data("couleur")]++;
+			score[$(".grille.i_2.j_2").data("couleur")]++;
+
+			if ($(".grille.i_0.j_0").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_0.j_1").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_0.j_2").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_1.j_0").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_1.j_1").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_1.j_2").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_2.j_0").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_2.j_1").data("jouable") == "1") score.jouable++; 
+			if ($(".grille.i_2.j_2").data("jouable") == "1") score.jouable++; 
+
+			console.log(score);
+
+			if ((score.jouable==0) && (score.blanc==5)) return "blanc";
+			if ((score.jouable==0) && (score.noir==5)) return "noir";
+			// OU si c'est fini 
+			if (score.jouable==0) return "egalite";
+
+			return false;
+		}
+
+		$(document).ready(function(){
+
+			$("#filename").val(filename);
+			$("#refreshtime").val(refreshtime);
+			
+			searchParams = new URLSearchParams(window.location.search); 
+			var p = searchParams.get("p");
+			console.log("p vaut " + p);
+			if (p != null) {
+				$("#filename").val(p);
+				filename = p; 
+			}
+			
+			phase = searchParams.get("phase");
+			$("#retour").prop("href", "aap-phase.html?phase=" + phase);
+		
+
+			window.setTimeout(refresh,0);
+
+			$("#filename").change(function (){
+				filename = $(this).val();
+				window.setTimeout(refresh,refreshtime*1000);
+				$(this).animate({opacity: 0.25},1000, function(){
+					$(this).animate({opacity: 1});
+				});
+			});
+
+			$("#refreshtime").change(function (){
+				refreshtime = $(this).val();
+				$(this).animate({opacity: 0.25},1000, function(){
+					$(this).animate({opacity: 1});
+				});
+			});
+			
+
+			$("#labelJ1").html(nomsJoueurs[0]); 
+			$("#labelJ2").html(nomsJoueurs[1]); 
+
+			//afficherTrait(trait);
+
+		});
+
+
+
+		function traiterJson(oRep){
+			// On remplit les grilles
+			var i,j,i_grille,j_grille;
+			/*
+			
+			"morpions":[
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2],
+				[2,0,2,2,2,2,2,2,2],
+				[2,2,2,2,2,2,2,2,2]]
+				
+			*/
+			
+			$("#partienom").html(oRep.uniqId);
+			$("#labelJ1").html(oRep.j1); 
+			$("#labelJ2").html(oRep.j2); 
+			$("#j1time").html(Math.floor(oRep.j1time/60) +"m " + oRep.j1time%60+"s");
+			$("#j2time").html(Math.floor(oRep.j2time/60) +"m " + oRep.j2time%60+"s"); 
+			
+			if (parseInt(oRep.trait) == 0) {
+				$("#j1").addClass("trait");
+				$("#j2").removeClass("trait");				
+			} else {
+				$("#j2").addClass("trait");
+				$("#j1").removeClass("trait");
+			}
+			
+			resetGrille();
+			
+			for(i=0;i<9;i++) 
+				for(j=0;j<9;j++) {
+					if (oRep.morpions[i][j] !=2) {
+					console.log("i"+i+" j"+j+"="+oRep.morpions[i][j]); 
+					console.log("igrille"+i%3+"jgrille"+Math.floor(i/3));
+					console.log("i"+j%3+"j"+Math.floor(j/3)); 
+						$(".grille.i_"+i%3+".j_"+Math.floor(i/3)+" .case.i_"+j%3+".j_"+Math.floor(j/3)+" .rond").removeClass("vide").addClass(cols[oRep.morpions[i][j]]);
+						$(".grille.i_"+i%3+".j_"+Math.floor(i/3)+" .case.i_"+j%3+".j_"+Math.floor(j/3)+" .rond").data("couleur",cols[oRep.morpions[i][j]]);		
+					} 
+				}
+
+			for(i_grille=0;i_grille<3;i_grille++) {
+				for(j_grille=0;j_grille<3;j_grille++) {
+					var g = testerGrille(i_grille,j_grille); 
+					if (g) {
+						console.log("grille gagnee : " + g);
+						$(".grille.i_"+i_grille+".j_"+j_grille).data("jouable","0");
+						$(".grille.i_"+i_grille+".j_"+j_grille).removeClass("jouable");
+						$(".grille.i_"+i_grille+".j_"+j_grille).addClass("terminee");
+						$(".grille.i_"+i_grille+".j_"+j_grille).addClass(g);
+						$(".grille.i_"+i_grille+".j_"+j_grille).data("couleur",g);
+					} else if (isPleine(i_grille,j_grille)) {
+						// Est-elle pleine ? Elle risque d'etre pleine meme si elle est gagnée... 
+						console.log("grille pleine");
+						$(".grille.i_"+i_grille+".j_"+j_grille).data("jouable","0");
+						$(".grille.i_"+i_grille+".j_"+j_grille).removeClass("jouable");
+						$(".grille.i_"+i_grille+".j_"+j_grille).addClass("terminee");
+						$(".grille.i_"+i_grille+".j_"+j_grille).addClass("pleine");
+						$(".grille.i_"+i_grille+".j_"+j_grille).data("couleur","vide");
+					}
+				}
+			}
+
+				// Le jeu est-il fini ? 
+				var v = testerJeu(); 
+				if (v) {
+					if (v != "egalite") {
+		 				$("#vainqueur").html("Vainqueur : " + v +"s"); //TODO : ajouter joueur 
+					} else {
+						// egalite
+						$("#vainqueur").html("Partie nulle !");
+					}
+				}
+				
+				
+				// Prochaine grille sélectionnée 
+				
+				if (oRep.lastMove != -1) {
+					i=oRep.lastMove.substr(1)%3;
+					j=Math.floor(oRep.lastMove.substr(1)/3);
+					
+					// attention si lastMove vaut -1
+					console.log("lastMove:"+ oRep.lastMove + "i="+i+"j="+j); 
+					// ATTENTION : .substr suppose que les coups dans le JSON 
+					// sont TOUJOURS formatés sur deux chiffres
+
+				
+					$(".selected").removeClass("selected"); 
+					
+					// A faire dans une boucle ?? NON car i,j est aussi la prochaine grille à utiliser ! 
+					if ($(".grille.i_"+i+".j_"+j).data("jouable") == "1") {
+						$(".grille.i_"+i+".j_"+j).addClass("selected");
+					} else {
+						// on sélectionne toutes les grilles jouables 
+						$(".jouable").addClass("selected"); 
+					}
+				}
+
+				trait = oRep.trait;
+				//afficherTrait(trait);
+			
+			
+			window.setTimeout(refresh,refreshtime*1000);
+		}
+
+		function refresh() {
+			console.log("refresh");
+			getJson();
+		}
+
+		function getJson() {
+			var scriptElement = document.createElement('script');
+			scriptElement.src = filename + '?cle=' + Math.random();
+			document.body.appendChild(scriptElement);
+		}
+	</script>
+</head>
+
+<body>
+
+<h1 style="display:inline;">AAP-direct : partie <span id="partienom"></span>
+</h1>
+<h3 style="float:right;"><a id="retour">Retour</a></h3>
+<br />
+Sync avec fichier : <input type="text" id="filename" /> <br/>
+Période raffraichissement : <input type="text" id="refreshtime"/> <br/><br/>
+<b><span id="vainqueur"></span></b>
+<br />
+
+<table>
+<tr>
+<th>Blancs : <span id="labelJ1">Blancs</span> </th><th>Noirs : <span id="labelJ2">Noirs</span></th>
+</tr>
+<tr>
+<td id="j1">Temps restant : <span id="j1time"></span></td>
+<td id="j2">Temps restant : <span id="j2time"></span></td>
+</tr>
+</table>
+<br />
+
+<table id="supermorpion">
+<tr>
+<td>
+	<table class="grille jouable selected i_0 j_0" data-jouable="1" data-i="0" data-j="0" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_1 j_0" data-jouable="1" data-i="1" data-j="0" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_2 j_0" data-jouable="1" data-i="2" data-j="0" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+<td>
+	<table class="grille jouable selected i_0 j_1" data-jouable="1" data-i="0" data-j="1" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_1 j_1" data-jouable="1" data-i="1" data-j="1" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_2 j_1" data-jouable="1" data-i="2" data-j="1" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+<td>
+	<table class="grille jouable selected i_0 j_2" data-jouable="1" data-i="0" data-j="2" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_1 j_2" data-jouable="1" data-i="1" data-j="2" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+<td>
+	<table class="grille jouable selected i_2 j_2" data-jouable="1" data-i="2" data-j="2" data-couleur="vide">
+	<tr data-j="0">
+		<td class="case i_0 j_0" data-i="0" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_0" data-i="1" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_0" data-i="2" data-j="0">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="1">
+		<td class="case i_0 j_1" data-i="0" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_1" data-i="1" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_1" data-i="2" data-j="1">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	<tr data-j="2">
+		<td class="case i_0 j_2" data-i="0" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_1 j_2" data-i="1" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+		<td class="case i_2 j_2" data-i="2" data-j="2">
+			<span class="rond vide" data-couleur="vide">&nbsp;</span></td>
+	</tr>
+	</table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+

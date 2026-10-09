@@ -1,0 +1,16 @@
+- Les joueurs doivent commencer par 'j' ou 'J', suivi de '_' ;
+- Ils sont considérés par ordre croissant du numéro qui suit la lettre j dans le nom du programme ; 
+- Les premiers numéros sont têtes de série, ils peuvent être exempts lors des tournois si une phase de qualifications est nécessaire.
+
+Caractéristiques des joueurs : 
+
+- aucun des joueurs n'utilise de minimax. Ainsi, les joueurs ne peuvent considérer que le coup à jouer et le coup suivant éventuellement pour prendre une décision ;
+- joueur_firstmove joue le premier coup légal disponible ;
+- joueur_aleatoire joue un coup aléatoire ;
+- joueur_stratege joue prioritairement au centre, sinon dans les coins, sinon au hasard ;
+- joueur_glouton prend une grille si cela est possible, sinon il joue comme stratège ;
+- joueur_prophylaxie prend s'il peut, sinon il joue comme stratège mais en évitant de jouer un coup qui offre une grille à l'addversaire ;
+- joueur_bloqueur prend une grille si cela est possible, sinon il joue de manière à casser un éventuel alignement présent sur la grille en cours, sinon il joue comme prophylaxie ; 
+- joueur_bloqueurattentif joue comme le précédent, mais ne casse pas un alignement si cela conduit à offrir une grille à l'adversaire au coup suivant ;  
+joueur_preneurattentif joue comme le précédent, mais dans le cas où plusieurs situations de prises de grilles sont possibles, il choisira la prise n'offrant pas de grille à l'adversaire au coup suivant si c'est possible.
+
