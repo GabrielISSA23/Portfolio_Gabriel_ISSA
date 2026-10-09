@@ -12,6 +12,8 @@ Thus, we estimate **client default risk** using three regression models: **Linea
 
 ## What the Project do ? 
 
+**Goal** : Maximize estimate the probability of customer default in order to determine to whom it is risky to lend money
+
 - Step 1 : Import and transform the credit data and create explonatory variable corresponding to the designed model. 
 - Step 2 :  Inspect correlations between variables.
 - Step 3 : Estimate the three regression model Linear Probability Model, Logit, and Probit models.
