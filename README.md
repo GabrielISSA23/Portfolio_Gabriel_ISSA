@@ -12,5 +12,3 @@ This repository showcases various projects I have worked on, whether professiona
 
 * **`AI Projects`**: Showcases various projects I have worked on in machine learning and artificial intelligence more broadly.
 
-* **`Professional Projects`**: Includes projects I completed during my internships. Due to copyright restrictions, the source code is not always available.
-
