@@ -1,0 +1,11 @@
+prospect,seniority,home,age,marital,job,expenses,income,assets,debt,amount,savings
+Maier,4,parents,27,single,fixed,35,330,0,0,370,4.86486
+Ginter,2,owner,23,single,fixed,35,120,5500,0,750,2.544
+Mauser,2,owner,26,married,fixed,60,13700,400000,350,1200,3.675
+Beckmann,8,owner,30,married,partime,60,180,30000,500,1000,1.5
+Heckmann,0,owner,47,separated,freelance,35,101,20000,4000,900,3.57333
+Buntschuh,2,rent,35,married,freelance,75,140,1000,0,1000,-0.3
+Kremer,4,rent,41,married,freelance,90,516,10000,0,1300,5.42769
+Schmidt,10,owner,30,married,fixed,60,242,7500,0,1550,7.04516
+Oener,10,owner,56,married,freelance,45,416,13500,0,500,7.824
+Fassbender,19,owner,47,married,freelance,90,332,12500,1000,875,4.52571

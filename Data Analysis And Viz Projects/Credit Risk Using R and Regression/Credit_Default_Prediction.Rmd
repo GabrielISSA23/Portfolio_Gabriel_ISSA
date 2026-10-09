@@ -1,0 +1,370 @@
+---
+title: "Credit Risk Analysis using Regression"
+author: "Gabriel ISSA"
+date: "2026-10-07"
+output: html_document
+---
+
+Package set up  
+```{r setup, message=FALSE, warning=FALSE}
+#install.package("stringr")
+#install.package("stargazer")
+#install.packages("ggplot2")
+#install.packages("dyplr")
+#install.packages("tidyr")
+#install.packages("corrplot")
+#library(stargazer)
+library(stringr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(corrplot)
+```
+
+
+# Probability models conception
+
+## Model design
+
+The first step we need to do is to import the data and decide which variables we want to include in the model
+```{r}
+raw_df = read.csv("raw_data/credit-1.csv", stringsAsFactors = TRUE)
+summary(raw_df)
+```
+#### Dependent variable : 
+
+- *default* : 1 if the client made a default 0 else 
+
+#### Raw variables to include : 
+
+- *senority* : (negative) Longer job tenure signals stable income and lower risk of sudden job loss
+
+- *age* : (negative) older borrowers are more experienced when managing their money and often have more stable financial situation which lead to lower default risk
+  
+#### Variables to transform : 
+
+- *Is_house_owner* is equal to 1 if the client own a house 
+  - Intuition : (negative) Homeowners have a valuable asset and may have already loan money to buy it so I expect lower default.
+
+- *is_married* is equal to 1 if the client is married else 0 
+  - Intuition : (negative) married couple have to income to reimburse a debt and a more stable situation which imply lower default risk. 
+    
+- *has_fixed_job* : 1 if job = "fixed" else 0 
+  - Intuition : (negative) a full time salary job mean stable income and so less financial situation volatility
+
+- *is_freelance* : 1 if job = "freelance" else 0 
+  - Intuition : (positive) a freelance job is synonym of volatile income and changing financial situation which induce higher default risk 
+    
+- *is_parttime* : part-time job are often mean limited and unstable income 
+- *reimbursement_cap* : `expenses / income`
+  - Intution : (positive) High expenses leave little disposable income to service the loan, so the expenses-to-income ratio should be positively related to default.
+
+- *income_to_total_debt* : `income / (debt + amount)`
+  - Intuition : (negative) the higher is the debt compared to income the hardest it will be for the client to reimburse it 
+
+- *savings_to_total_debt* : `savings / (debt + amount)`
+  - Intuition : (negative) Savings are a liquidity cushion that lets a borrower keep paying during a temporary income shock, so the lower it is compared to debt the higher the higher the risk
+
+- `log(1+income)` : 
+  - Intuition : (negative) Higher income means more capacity to absorb repayments and unexpected shocks, so I expect a negative sign. I use the log because the effect shows diminishing returns.
+
+- `log(1+asset)` : 
+  - Intuition : (negative) same principle than income
+
+#### To exclude of the analysis : 
+
+- *id* : identifier of the client
+
+
+### Final regression equation : 
+This corresponds to the following final equation : 
+$$
+\begin{aligned}
+\text{default}_i =\;& \beta_0
++ \beta_1 \text{seniority}_i
++ \beta_2 \text{age}_i \\
+&+ \beta_3 \text{Is_house_owner}_i
++ \beta_4 \text{Is_married}_i \\
+&+ \beta_5 \text{has_fixed_job}_i
++ \beta_6 \text{is_freelance}_i
++ \beta_7 \text{is_parttime}_i \\
+&+ \beta_8 \text{reimbursement_cap}_i
++ \beta_9 \text{income_to_total_debt}_i \\
+&+ \beta_{10} \text{savings_to_total_debt}_i \\
+&+ \beta_{11} \ln(1+\text{income}_i)
++ \beta_{12} \ln(1+\text{assets}_i)
++ \varepsilon_i
+\end{aligned}
+$$
+
+
+## Data Preparation 
+
+The data needs to be cleaned and transformed to correspond to the designed model
+```{r}
+df = read.csv("raw_data/credit-1.csv", stringsAsFactors = TRUE)
+df$Is_house_owner <- as.numeric(df$home == "owner")
+df$Is_married <- as.numeric(df$marital == "married")
+df$has_fixed_job <- as.numeric(df$job == "fixed")
+df$is_freelance <- as.numeric(df$job == "freelance")
+df$is_parttime <- as.numeric(df$job == "partime")
+df$reimbursment_cap <- df$expenses/df$income
+df$income_to_total_debt <- df$income/(df$debt+df$amount)
+df$savings_to_total_debt <- df$savings/(df$debt+df$amount)
+df$log_income <- log(1 + df$income)
+df$log_assets <- log(1 + df$assets)
+
+df = df[,c("default","seniority","age","Is_house_owner","Is_married","has_fixed_job","is_freelance","is_parttime","reimbursment_cap","income_to_total_debt","savings_to_total_debt","log_income","log_assets")]
+```
+
+
+Check colinearity and data :
+
+The colinearity between all the variables needs to be computed to check the multicolinearity hypothesis and indicate if the dependant variable has a linear relationship with the independent variables. 
+```{r}
+vars <- c("default", "seniority", "age", "Is_house_owner","Is_married","has_fixed_job", "is_freelance", "is_parttime","reimbursment_cap", "income_to_total_debt","savings_to_total_debt","log_income", "log_assets")
+
+cor_mat <- round(cor(df[, vars], use = "complete.obs"), 2)
+
+corrplot(cor_mat,
+         method = "color", type = "upper",
+         addCoef.col = "black", number.cex = 0.55,
+         tl.col = "black", tl.srt = 45,
+         title = "Correlation Matrix", mar = c(0, 0, 2, 0))
+
+```
+
+# Model creation
+
+## LPM model estimating
+
+```{r}
+LPM <- lm(default ~ seniority + age + Is_house_owner + Is_married + has_fixed_job + is_freelance + is_parttime + reimbursment_cap + income_to_total_debt + savings_to_total_debt + log_income + log_assets, df) 
+summary(LPM)
+```
+
+## Logit model estimating 
+
+```{r}
+logit <- glm(default ~ seniority + age + Is_house_owner + Is_married + has_fixed_job + is_freelance + is_parttime + reimbursment_cap + income_to_total_debt + savings_to_total_debt + log_income + log_assets, df, family = binomial(link = "logit")) 
+summary(logit)
+```
+
+## Probit estimating 
+
+```{r}
+probit <- glm(default ~ seniority + age + Is_house_owner + Is_married + has_fixed_job + is_freelance + is_parttime + reimbursment_cap + income_to_total_debt + savings_to_total_debt + log_income + log_assets, df, family = binomial( link = "probit"))
+summary(probit)
+```
+
+## Interpretation :
+
+- *seniority*  : negative coefficient as expected, significant at 99% level
+- *age* : positive and significant at 99% level, meaning that the older is the client the higher is the higher is the default risk. May be due to bigger financial pressure due to children for age range 35 - 60 yo and less financial capacities for age range > 60 yo
+- *Is_house_owner* : negative as expected, significant at 95% level of confidence 
+- *Is_married* : not significant, may be due to high financial pressure for families 
+- *has_fixed_job* : negative as expected, significant at 95% level of confidence
+- *is_freelance* : not significant, being freelance may induce more volatility but is often related to higher incomes and more flexibility 
+- *is_parttime* : positive as expected, significant at 99% level of confidence 
+*reimbursment_cap* : not significant, may be due to the fact that expenses changes when people loan money, so the reimbursment_cap ratio is not relevant anymore 
+- *income_to_total_debt* : negative and large meaning it has a big impact on the default capacity, which make sense because the risk of default is related to the value of the debt compared to the ability to reimburse this debt 
+- *savings_to_total_debt* : surprisingly positive, may be due to colinearity with income_to_total_debt 
+- *log_income* and *log_asset* : both negative and significant at 95% level of confidence
+
+# Application of the model to 10 personas  
+
+We will know use the 3 models created to estimate the probabilities of default of 10 clients that asked for a loan. 
+
+## Data Preparation
+```{r}
+to_predict <- read.csv("raw_data/prospects.csv",stringsAsFactors = TRUE)
+summary(to_predict)
+
+to_predict$Is_house_owner <- as.numeric(to_predict$home == "owner")
+to_predict$Is_married <- as.numeric(to_predict$marital == "married")
+to_predict$has_fixed_job <- as.numeric(to_predict$job == "fixed")
+to_predict$is_freelance <- as.numeric(to_predict$job == "freelance")
+to_predict$is_parttime <- as.numeric(to_predict$job == "partime")
+to_predict$reimbursment_cap <- to_predict$expenses/to_predict$income
+to_predict$income_to_total_debt <- to_predict$income/(to_predict$debt+to_predict$amount)
+to_predict$savings_to_total_debt <- to_predict$savings/(to_predict$debt+to_predict$amount)
+to_predict$log_income <- log(1 + to_predict$income)
+to_predict$log_assets <- log(1 + to_predict$assets)
+
+to_predict = to_predict[,c("seniority","age","Is_house_owner","Is_married","has_fixed_job","is_freelance","is_parttime","reimbursment_cap","income_to_total_debt","savings_to_total_debt","log_income","log_assets","amount","prospect")]
+
+```
+
+Predict the probabilities for the prospect using the three different models
+```{r}
+to_predict$p_LPM <- pmin(1,pmax(0, predict(LPM, newdata = to_predict))) 
+to_predict$p_logit <- predict(logit, newdata = to_predict, type = "response" )
+to_predict$p_probit <- predict(probit, newdata = to_predict, type = "response")
+```
+
+## Models estimated probabilities comparison :
+```{r}
+probabilities <- to_predict %>%
+  select(prospect, p_LPM, p_logit, p_probit) %>%
+  pivot_longer(
+    cols = c(p_LPM, p_logit, p_probit),
+    names_to = "Model",
+    values_to = "Probability"
+  )
+
+probabilities_comparison_plot <- ggplot(probabilities,
+       aes(x = prospect, y = Probability, fill = Model)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Predicted Default Probability by Prospect",
+    x = "Prospect",
+    y = "Predicted probability",
+    fill = "Model"
+  ) +
+  theme_minimal()
+
+print(probabilities_comparison_plot)
+
+ggsave( filename = "Output_plots/probabilities_comparison.png", plot = probabilities_comparison_plot , width = 9, height = 6, dpi = 300 )
+```
+
+# Application of the result to a 1- year loan 10% IR
+
+We will know consider they asked for a 1-year loan with 10% interest rate, considering no cost of borrowing and no other variable costs : 
+
+Earning without default : 
+$$
+\begin{aligned} Earning \ without \ default = \;& 0.10 *  Loan \ amount
+\end{aligned}
+$$
+```{r}
+to_predict$earning_wo_default <- 0.10 * to_predict$amount
+
+```
+
+
+Expected earnings : *using the law of total probability*
+$$
+\begin{aligned} Expected \ earning  = \;& ( 1 - p_{default} ) * Earning \ without \ default \ - \ p_{default} \ * \ Loan \ amount
+\end{aligned}
+$$
+```{r}
+to_predict$expected_earning <- (1 - to_predict$p_LPM) * to_predict$earning_wo_default - to_predict$p_LPM * to_predict$amount
+```
+
+
+A loan is accepted if the expected earning is positive
+```{r}
+
+# if loan accepted : Final decision = 1 
+# if loan refused : Final decision = 0
+to_predict$final_decision <- as.numeric(to_predict$expected_earning > 0)
+
+print(str_glue("Number of accepted loan : {sum(to_predict$final_decision)}")) 
+accepted_loan_names_list <- to_predict[to_predict$final_decision == 1,"prospect"]
+
+print(str_glue("Accepted loan names list : {accepted_loan_names_list}"))
+
+
+```
+
+
+The expected total profit would be : 
+
+```{r}
+total_expected_earning = sum(as.numeric(to_predict$final_decision) * to_predict$expected_earning)
+
+print(str_glue("expected earning : {round(total_expected_earning,2)} $"))
+```
+
+### Summary of the decision : 
+```{r}
+expected_profit_by_prospect <- ggplot(to_predict,
+       aes(x = reorder(prospect, expected_earning),
+           y = expected_earning,
+           fill = factor(final_decision))) +
+  geom_col() +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  scale_fill_manual(
+    values = c("0" = "grey70", "1" = "steelblue"),
+    labels = c("0" = "Rejected", "1" = "Accepted")
+  ) +
+  labs(
+    title = "Expected Profit by Loan Applicant",
+    x = "Prospect",
+    y = "Expected profit ($)",
+    fill = "Decision"
+  ) +
+  theme_minimal()
+
+print(expected_profit_by_prospect)
+
+ggsave( filename = "Output_plots/expected_profit_by_prospect.png", plot = expected_profit_by_prospect , width = 9, height = 6, dpi = 300 )
+
+```
+
+
+### Bad Scenario
+
+To limit the risk at the maximum we can use the upper bound of the probability interval 
+
+```{r}
+#predict probability with prediction interval
+prediction_interval <- predict(LPM,newdata = to_predict,interval="prediction",level = 0.95
+)
+to_predict$Bad_Scn_p_LPM <- pmin(1,pmax(0, prediction_interval[, "upr"]))
+
+#compute expected earning 
+to_predict$Bad_Scn_expected_earning <- (1 - to_predict$Bad_Scn_p_LPM) * to_predict$earning_wo_default - to_predict$Bad_Scn_p_LPM * to_predict$amount
+
+#compute final decision
+to_predict$Bad_Scn_final_decision <- as.numeric(to_predict$Bad_Scn_expected_earning > 0)
+
+print(str_glue("Number of accepted loan : {sum(to_predict$Bad_Scn_final_decision)}")) 
+Bad_Scn_accepted_loan_names_list <- to_predict[to_predict$Bad_Scn_final_decision == 1,"prospect"]
+
+#compute total expected earning
+Bad_Scn_total_expected_earning = sum(as.numeric(to_predict$Bad_Scn_final_decision) * to_predict$Bad_Scn_expected_earning)
+
+print(str_glue("Accepted loan names list : {Bad_Scn_accepted_loan_names_list}"))
+
+print(str_glue("expected earning : {round(Bad_Scn_total_expected_earning,2)} $"))
+
+```
+
+### Visual comparison between bad scenario and baseline 
+
+```{r}
+scenario_results <- data.frame(
+  Scenario = c("Baseline", "Negative scenario"),
+  Expected_Profit = c(
+    total_expected_earning,
+    Bad_Scn_total_expected_earning
+  )
+)
+
+scenarii_comparison <- ggplot(scenario_results,
+       aes(x = Scenario, y = Expected_Profit, fill = Scenario)) +
+  geom_col(width = 0.6) +
+  geom_text(
+    aes(label = paste0(round(Expected_Profit, 2), " $")),
+    vjust = -0.5
+  ) +
+  labs(
+    title = "Expected Portfolio Profit: Baseline vs Downside",
+    x = NULL,
+    y = "Expected profit ($)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+print(scenarii_comparison)
+
+ggsave( filename = "Output_plots/scenarii_comparison.png", plot = scenarii_comparison , width = 9, height = 6, dpi = 300 )
+```
+
+
+
+
