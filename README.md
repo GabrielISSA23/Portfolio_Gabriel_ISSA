@@ -1,6 +1,6 @@
-# Portfolio_Gabriel_ISSA
+# Portfolio Gabriel ISSA
 
-This repository showcases various projects I have worked on, whether professionally, academically, or personally, using several programming languages: Python, R, C, and SQL. Some focus on technical topics such as finance, while others reflect my personal interests, including music and strategy games.
+This repository showcases various projects I have worked on, whether professionally, academically, or personally, using several programming languages: **Python**, **R**, **C**, and **SQL**. Some focus on technical topics such as finance, while others reflect my personal interests, including music and strategy games.
 
 ## Project Structure
 
