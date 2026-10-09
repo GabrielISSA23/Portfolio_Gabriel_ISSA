@@ -4,7 +4,7 @@ In 2026, during my exchange in the *Master in Analytics & Artficial Intelligence
 
 Thus, we want to estimate **client default risk** using three regression models: **Linear Probability Model (LPM)**, **Logit**, and **Probit** to determine to which client it is risky to lend money. 
 
-## key outputs :
+## Key outputs :
 
 - `Credit_Default_Analysis.Rmd` to see the latex pdf with the entire code of the project
   
