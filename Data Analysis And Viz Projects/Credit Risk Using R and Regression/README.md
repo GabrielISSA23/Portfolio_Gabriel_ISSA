@@ -2,7 +2,7 @@
 
 In 2026, during my exchange in the *Master in Analytics & Artficial Intelligence* at *ESMT Berlin*, I learned to use **R** for statistical prediction and causal inference. This project applies the concepts of *linear* and *non-linear regression* to estimate the credit default risk of 10 potential clients. To do so, we use historical data on 1,000 of the bank's clients, including various attributes associated with each client as well as the probability that a given client defaults on a payment.
 
-Thus, we estimate **client default risk** using three regression models: **Linear Probability Model (LPM)**, **Logit**, and **Probit**.
+Thus, we want to estimate **client default risk** using three regression models: **Linear Probability Model (LPM)**, **Logit**, and **Probit** to determine to which client it is risky to lend money. 
 
 ## key outputs :
 
@@ -11,8 +11,6 @@ Thus, we estimate **client default risk** using three regression models: **Linea
 - `/Output_plots` folder to see graphs of the projects
 
 ## What the Project do ? 
-
-**Goal** : Maximize estimate the probability of customer default in order to determine to whom it is risky to lend money
 
 - Step 1 : Import and transform the credit data and create explonatory variable corresponding to the designed model. 
 - Step 2 :  Inspect correlations between variables.
