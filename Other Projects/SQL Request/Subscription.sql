@@ -2,13 +2,7 @@
 /*
 Context:
 This logic is used to identify member activity during the validity period of their one-year subscription to the NoumeaStreaming platform. 
-The goal is to see if people are subscribed to Noumea STreaming when they buy 
-Logic:
-Step 1: Retrieve and parse all NoumeaStreaming subscriptions.
-Step 2: Merge subscriptions that overlap or fall within the same date range.
-Step 3: Retrieve all member activities that meet both of the following conditions:
-Condition 1: The member has subscribed to NoumeaStreaming.
-Condition 2: The activity date falls between the start date and end date of one of the member's subscriptions.
+The goal is to see if people are subscribed to NoumeaStreaming when they buy a subscription to an other streaming platform
 If both conditions are met, the activity is flagged as has_sub_noumeastreaming
 */
 
@@ -21,7 +15,7 @@ SELECT
     activity_datetime + INTERVAL '1 year' AS sub_end_date,
     ROW_NUMBER() OVER (PARTITION BY id_member ORDER BY activity_datetime) AS sub_rank
 FROM
-   (streaming_mail.activities UNION ALL client_mail2 ) AS client_mail_all
+   (streaming.client_mails1 UNION ALL streaming.client_mails2) AS client_mail_all
 WHERE
     source_name IN ("noumeastreaming-mailing-1", "noumeastreaming-mailing-2","noumeastreaming-mailing-2")
     AND mail_type = "Subscription" 
