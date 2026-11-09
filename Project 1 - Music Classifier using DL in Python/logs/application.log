@@ -1,0 +1,27 @@
+2026-09-27 18:36:35,658 | DEBUG | __main__ | main.py launched, logging configured successfully
+2026-09-27 18:38:02,874 | CRITICAL | root | Something went wrong with the training data logging
+NoneType: None
+2026-09-27 18:38:17,083 | DEBUG | root | main.py launched, logging configured successfully
+2026-09-27 18:39:10,599 | INFO | root | Data loaded
+2026-09-27 18:41:05,066 | CRITICAL | root | Something went wrong with the training data loading
+Traceback (most recent call last):
+  File "c:\users\gabi\documents\geb\music_classifier_github_version\training_model.py", line 22, in <module>
+    data = pd.read_csv(path / "data" / "training_data.csv", low_memory=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gabi\anaconda3\Lib\site-packages\pandas\io\parsers\readers.py", line 948, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gabi\anaconda3\Lib\site-packages\pandas\io\parsers\readers.py", line 611, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gabi\anaconda3\Lib\site-packages\pandas\io\parsers\readers.py", line 1448, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Gabi\anaconda3\Lib\site-packages\pandas\io\parsers\readers.py", line 1705, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "C:\Users\Gabi\anaconda3\Lib\site-packages\pandas\io\common.py", line 863, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\Gabi\\Documents\\GEB\\music_classifier_github_version\\data\\training_data.csv'
+2026-09-27 18:41:47,816 | INFO | root | Data loaded
