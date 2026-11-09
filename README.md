@@ -8,6 +8,8 @@ This repository showcases various projects I have worked on, whether professiona
 
 ## Repository Structure
 
+* **`Project 1`**: An Python-based project focused on constructing a Deep Learning model to predict the style of music.
+
 * **`Project 3`**: An R-based project focused on using linear and non-linear regression to estimate probabilities of payment default.
 
 * **`Other Projects`**: Showcases various projects I have worked that are more or less closely related to data science. 
